@@ -140,8 +140,70 @@ We have found our four users
 
 Answer: root, roy, sol, user
 
-Question 3 - Which four users did the botnet attempt to breach?
+Question 3 - Finally, which IP managed to breach the root user?
 <br />
+We know of two ip addresses part of the botnet attack: 193.46.255.33 and 80.94.95.112.
+
+We will now filter through the auth.log to look for a sucessul login to the root user from one of these ip addresses
+
+<img width="1168" height="71" alt="Screenshot 2026-04-05 at 3 41 27 PM" src="https://github.com/user-attachments/assets/7273e9a8-f91a-47ef-afc9-f781d4abcaae" />
+
+Even though that the ip address is not part of the initial 2 ip addresses we identified as part of the botnet, looking back at the logs we can see the participation of the 91.224.92.79 address in the botnet.
+
+I ran the same command as in question 2 of this same task: 
+cat /var/log/auth.log | grep "ssh" | grep -i "failed"
+<img width="1421" height="177" alt="Screenshot 2026-04-05 at 3 46 37 PM" src="https://github.com/user-attachments/assets/b0d2bebe-63ac-46db-b4b6-601c9c41e86b" />
+
+Answer: 91.224.92.79
+
+Task 4 - Initial Access via Services
+
+Not only do attackers use SSH to gain initial access to your system. but also through services.
+In order to check for a potential, we are going to have to analyze logs related to our services, like our web servers.
+
+In the example of the image, TryPingMe Web Logs, we can see that our web server is vulnerable for command injection. Command injection is a vulnerability where an attacker can execute commands on a server because user input is improperly handled. The attacker was able to run linux commands like whoami, hello, and ls in the web server. The attacker shouldn't be able to run these commands. The backend was not coded safely in order to sanitize the user input which an attacker can exploit and gain initial access.
+
+For the questions, we are going to analyze TryPingMe web logs. It seems like TryPingMe is running on a nginx web server. To analyze then the logs, we will find them in /var/log/nginx/access.log
+
+Question 1 - What is the path to the Python file the attacker attempted to open?
+<br />
+We are told in the question we are looking for a python file. Python files have an extension of .py, so let us search for ".py" in the access.log
+
+<img width="1417" height="136" alt="Screenshot 2026-04-05 at 5 16 00 PM" src="https://github.com/user-attachments/assets/8d809781-39bf-4ad3-a2b9-740e1c702a46" />
+
+From the first entry, we can see that there was a GET command for a main.py file.
+GET /ping?host=;cat+/opt/trypingme/main.py HTTP/1.1" 200 330 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+
+A quick recap on URI:
+* GET - is the HTTP request method. This method indicates that the client is requesting something from the server
+* /ping - is the endpoint the client accessed.
+* ? - declares that the following are parameters, like variables, that the client can set, in this case the parameter that was set is host
+Host will have a value equal to ";cat+/opt/trypingme/main.py"
+
+The most likely use of the backend code is "ping <host>".
+For example the user would write 8.8.8.8, the URI looks like "/ping?host=8.8.8.8" and the code looks like "ping 8.8.8.8"
+
+However in this case we have ";cat+/opt/trypingme/main.py". The ";" closes the ping command and introduces the cat command wanting to access read the /opt/trypingme/main.py
+The + symbol represents a space in URI encoding.
+
+The attacker is trying to access /opt/trypingme/main.py
+
+Answer: /opt/trypingme/main.py
+
+Question 2 - Looking inside the opened file, what's the flag you see there?
+We now need to find the file /opt/trypingme/main.py.
+
+If we simply cat the file we get our answer.
+
+<img width="582" height="616" alt="Screenshot 2026-04-05 at 5 26 42 PM" src="https://github.com/user-attachments/assets/687ea964-658a-4f30-b47b-33f04d645c70" />
+
+This question is pretty simple. It could be confusing in where to start to look for the file. We know that the file is in /opt/trypingme/main.py. We can start by using the cat command directly first. 
+
+Answer: THM{i_am_vulnerable!}
+
+Task 5 - Detecting Service Breach
+This task focuses on learning to use process analysis in order to
+
 
 
 
