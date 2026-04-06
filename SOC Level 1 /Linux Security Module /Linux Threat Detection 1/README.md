@@ -317,7 +317,7 @@ This is a Supply Chain Compromise. Trusted apps were compromised to run maliciou
 <br />
 <h2>Conclusion</h2>
 <br />
-In this room we learened:
+In this room we learned:
 <br />
 <ul>
   <li>Analyzed authentication logs to detect initial access via services and SSH</li>
