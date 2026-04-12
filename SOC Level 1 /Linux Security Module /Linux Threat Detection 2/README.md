@@ -145,6 +145,55 @@ Task Template
 <img width="1423" height="197" alt="Screenshot 2026-04-12 at 3 58 39 PM" src="https://github.com/user-attachments/assets/d0fcfe00-29d8-4bae-bc67-176c997be4fb" />
 
 To recap the information that auditl provides:
+<ul>
+  <li>PROCTITLE - provides the human-readable command that a user wrote</li>
+  <li>CWD - where the command is run from</li>
+  <li>SYSCALL - shows the underlying system call (execve) used to execute that command, along with metadata such as process ID, user, and execution status.</li>
+</ul>
+
+<p> So in this process, we see that the user-readable command is <i>bash debug.sh</i></p>
+<p> This is the command the user wrote in his terminal. This tells us that the user ran the debug.sh file which we know it is a script because it is a .sh file </p>
+
+<img width="1427" height="123" alt="Screenshot 2026-04-12 at 4 12 54 PM" src="https://github.com/user-attachments/assets/4dbdd2a0-fdaf-45d6-8816-573399aa68ba" />
+
+<p> We just know the name and the extension of the file. PROCTITLE didnt give us information on where the file lives</p>
+<p> That is why CWD is useful, this tells us the folder in which the command was ran from, which in this case is /home/itsupport </p>
+
+<img width="1424" height="194" alt="Screenshot 2026-04-12 at 4 13 39 PM" src="https://github.com/user-attachments/assets/ad537a97-6f33-49d7-a06f-911b0543fa0d" />
+
+<p> Using this information we collected, we can concluded that the path of the script that started the <i>hostname</i> process is <i>/home/itsupport/debug.sh</i> </p>
+
+<h5>Answer: /home/itsupport/debug.sh</h5>
+
+<h4>Question 2 - What was the last Discovery command launched by the script?</h4>
+<p> We know that the /home/itsupport/debug.sh launched the hostname process, however, if this was a Discovery attempt, then it probably wasnt the only one. </p>
+<p> Our goal is to find the last Discovery command that the script ran</p>
+<br />
+<p> Similar to the hostname process, any process spawned by another process will have its parent recorded via the Parent Process ID (PPID)</p>
+<p> In order to find more process that we ran by the script, we can filter the logs to only show those that have the parent process id of the script process, 3771</p>
+
+<p> After running this command, we get lots of results </p>
+<img width="1426" height="468" alt="Screenshot 2026-04-12 at 4 24 28 PM" src="https://github.com/user-attachments/assets/7f50896e-7e73-4920-a613-28ac79318805" />
+
+<p> We see the script ran the <i>lscpu</i> command. This command displays comprehensive system information about the kernel and operating system.</p>
+
+<img width="1425" height="578" alt="Screenshot 2026-04-12 at 4 31 51 PM" src="https://github.com/user-attachments/assets/00c6d25e-97c9-4c50-b87b-82fe744fc4d6" />
+
+<p> The script also ran the <i>lscpu</i> command. This command displays detailed information about the system’s CPU architecture and configuration.</p>
+
+<img width="1426" height="583" alt="Screenshot 2026-04-12 at 4 30 29 PM" src="https://github.com/user-attachments/assets/1091eb3c-f4d4-45ee-a391-65b08f2e9d91" />
+
+<p> Scrolling down </p>
+<img width="1430" height="661" alt="Screenshot 2026-04-12 at 4 33 18 PM" src="https://github.com/user-attachments/assets/6b2d2778-f4ed-401e-b0a3-7fc3d58df7bb" />
+<p> We analyze that the last command ran was <i>head -n 10</i> </p>
+<p> However, the question is asking for the last Discovery command that ran, this is not a Discovery command </p>
+<p> The <i>head</i> command is a Linux utility used to display the beginning (top portion) of a file or output. The -n flag limits the amount of lines displayed, which in this case is 10. </p>
+
+<br />
+
+<p> The command before  </p>
+
+
 
 
 <h5>Answer: No answer needed</h5>
