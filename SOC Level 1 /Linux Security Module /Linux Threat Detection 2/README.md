@@ -40,6 +40,7 @@ Task Template
 
 -->
 
+<!------------------------------------------------------------------------------------------------------------------------------------------->
 
 <h2>Task 1 - Introduction</h2>
 <p>Linux is widely used in our networks, we must be prepared to respond to incidents</p>
@@ -55,9 +56,64 @@ Task Template
 <h4>Question 1 - Read the Question Above</h4>
 <h5>Answer: No answer needed</h5>
 
-<h2>Task [Task Number] - [Task Name]</h2>
+<!------------------------------------------------------------------------------------------------------------------------------------------->
+
+<h2>Task 2 - Discovery Overview</h2>
+
+<p>Most of the time, Inital Access is done by a bot. However Discovery is usually done by a person </p>
+<p>MITRE ATTA&CK Framework defines Discovery Techniques as "techniques an adversary may use to gain knowledge about the system and internal network." </p>
+<p>This concept is very reladable. The first thing we do when we are in a place we havent visited for the first time is gain an idea of where and how to get to different palces </p>
+<p> The place being a relative or friends house, an airbnb, a cruise ship, the first thing we do in a new place is explore </p>
+<p> Same thing here </p>
+<br />
+<p> The attacker has gained access using an initial access technique into a system he or she has no idea about </p>
+<p> Therefore the attacker will try to do things in order to gain information on the systems, network, devices, users in an enviroment </p>
+<p> We may ask questions to someone who has been to the place, a guide, house owner, or the the internet for more information on the new place, attackers however run commands</p>
+<p> These commands are used in non malicious scenarios. Therefore, We must analyze if these commands are being used in a malicious way.</p>
+<br />
+<p> THM teaches that one command in particular that is characteristic of an attack is: <i>whoami</i> </p>
+<p> Usually after there is a breach, <i>whoami</i> is the first command that the attacker runs</p>
+
+<p>  </p>
 
 <h3>Questions:</h3>
 
-<h4>Question 1 - Read the Question Above</h4>
-<h5>Answer: No answer needed</h5>
+<p>Run systemd-detect-virt to detect the system's cloud.</p>
+<h4><i>Question 1 - What is the command's output you discovered?</i></h4>
+
+<p>The <i>systemd-detect-virt</i> command is a Linux utility command that tells you whether the system is running inside a virtualized environment and if so which one.</p>
+<p>In this case, when we run the command in our vm we get the following answer</p> 
+
+<img width="519" height="71" alt="Screenshot 2026-04-12 at 2 53 37 PM" src="https://github.com/user-attachments/assets/fc5a797e-1d77-4381-83e1-804fb9af0333" />
+
+<p> The output tells us that the virtual machine is running inside AWS (Amazon Web Services). </p>
+<h5>Answer: Amazon</h5>
+
+<p> Now run ps aux and look for EDR or antivirus processes.</p>
+<h4><i>Question 2 - What is the full path to the detected antimalware binary?</i></h4>
+
+<p> The <i>ps aux</i> command shows all the running processes with detailed metadata on the system</p>
+<p> The <i>aux</i> part of the command is now a word, but indicates three flags </p>
+<ul>
+  <li>a - show processes for all users</li>
+  <li>u - displays the data in a user friendly format</li>
+  <li>x - include processes without a terminal (background services, daemons)</li>
+</ul>
+
+<p>When you run the command, you will get a long list of all the processes currently running in the system</p> 
+
+<img width="1425" height="665" alt="Screenshot 2026-04-12 at 3 28 56 PM" src="https://github.com/user-attachments/assets/71a16ba8-816a-41d7-9c27-0a37ee6abc34" />
+
+<p> It can be easily intimidating finding the answer in so much output. </p>
+<p> I read through all the entries in the COMMAND column to find one that sounded like an antivirus process </p>
+<p> I ran into one that had malscan, which could be an abbreviation for malware scan</p>
+
+<img width="1424" height="662" alt="Screenshot 2026-04-12 at 3 33 00 PM" src="https://github.com/user-attachments/assets/b7482b67-a6ac-4aa1-9b12-89045ff4719c" />
+
+<h5>Answer: /var/lib/ultrasec/malscan</h5>
+
+<p> We tan two commands which told us that this computer is running in an amazon virtual enviroment and the location of the antivirus software </p>
+<p> We have discovered information of this device </p>
+
+
+
