@@ -191,8 +191,13 @@ To recap the information that auditl provides:
 
 <br />
 
-<p> The command before  </p>
+<img width="1427" height="618" alt="Screenshot 2026-04-12 at 5 22 24 PM" src="https://github.com/user-attachments/assets/a72d0ec3-fa94-479c-91a7-7bd48354761d" />
 
+
+<p> The command before is <i>ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu</i> </p>
+<p> This command begins with the ps command that shows the processes that are currently running in the system. This is the same command we saw in the previous quesiton (<i>ps aux</i>) </p>
+
+<p> In this case, we see </p>
 
 
 
